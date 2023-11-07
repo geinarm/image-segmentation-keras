@@ -11,7 +11,7 @@ from time import time
 
 from .train import find_latest_checkpoint
 from .data_utils.data_loader import get_image_array, get_segmentation_array,\
-    DATA_LOADER_SEED, class_colors, get_pairs_from_paths
+    DATA_LOADER_SEED, class_colors, get_pairs_from_paths, imread
 from .models.config import IMAGE_ORDERING
 
 
@@ -143,10 +143,7 @@ def predict(model=None, inp=None, out_fname=None,
         "Input should be the CV image or the input file name"
 
     if isinstance(inp, six.string_types):
-        inp = cv2.imread(inp, read_image_type)
-
-    if read_image_type == cv2.IMREAD_GRAYSCALE:
-        inp = np.reshape(inp, (inp.shape[0], inp.shape[1], 1))
+        inp = imread(inp, read_image_type)
 
     assert (len(inp.shape) == 3 or len(inp.shape) == 1 or len(inp.shape) == 4), "Image should be h,w,3 "
 
