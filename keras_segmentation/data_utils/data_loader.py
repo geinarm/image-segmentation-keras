@@ -37,6 +37,12 @@ class DataLoaderError(Exception):
     pass
 
 
+def imread(file, read_image_type=cv2.IMREAD_COLOR):
+    img = cv2.imread(file, read_image_type)
+    if read_image_type == cv2.IMREAD_GRAYSCALE:
+        img = np.reshape(img, (img.shape[0], img.shape[1], 1))
+
+    return img
 
 def get_image_list_from_path(images_path ):
     image_files = []
@@ -141,7 +147,7 @@ def get_image_array(image_input,
         if not os.path.isfile(image_input):
             raise DataLoaderError("get_image_array: path {0} doesn't exist"
                                   .format(image_input))
-        img = cv2.imread(image_input, read_image_type)
+        img = imread(image_input, read_image_type)
     else:
         raise DataLoaderError("get_image_array: Can't process input type {0}"
                               .format(str(type(image_input))))
@@ -182,7 +188,7 @@ def get_segmentation_array(image_input, nClasses,
         if not os.path.isfile(image_input):
             raise DataLoaderError("get_segmentation_array: "
                                   "path {0} doesn't exist".format(image_input))
-        img = cv2.imread(image_input, read_image_type)
+        img = imread(image_input, read_image_type)
     else:
         raise DataLoaderError("get_segmentation_array: "
                               "Can't process input type {0}"
@@ -212,8 +218,8 @@ def verify_segmentation_dataset(images_path, segs_path,
 
         return_value = True
         for im_fn, seg_fn in tqdm(img_seg_pairs):
-            img = cv2.imread(im_fn)
-            seg = cv2.imread(seg_fn)
+            img = imread(im_fn)
+            seg = imread(seg_fn)
             # Check dimensions match
             if not img.shape == seg.shape:
                 return_value = False
@@ -273,9 +279,9 @@ def image_segmentation_generator(images_path, segs_path, batch_size,
                     seg = None 
                 else:
                     im, seg = next(zipped)
-                    seg = cv2.imread(seg, 1)
+                    seg = imread(seg, 1)
 
-                im = cv2.imread(im, read_image_type)
+                im = imread(im, read_image_type)
                 
 
                 if do_augment:
@@ -300,12 +306,12 @@ def image_segmentation_generator(images_path, segs_path, batch_size,
 
                 im, seg, others = next(zipped)
 
-                im = cv2.imread(im, read_image_type)
-                seg = cv2.imread(seg, 1)
+                im = imread(im, read_image_type)
+                seg = imread(seg, 1)
 
                 oth = []
                 for f in others:
-                    oth.append(cv2.imread(f, read_image_type))
+                    oth.append(imread(f, read_image_type))
 
                 if do_augment:
                     if custom_augmentation is None:
