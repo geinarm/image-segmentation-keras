@@ -38,9 +38,19 @@ class DataLoaderError(Exception):
 
 
 def imread(file, read_image_type=cv2.IMREAD_COLOR):
+    # Read an image from a file and make sure the output array has the correct shape
     img = cv2.imread(file, read_image_type)
     if read_image_type == cv2.IMREAD_GRAYSCALE:
         img = np.reshape(img, (img.shape[0], img.shape[1], 1))
+
+    return img
+
+def resize(img, new_size, interpolation = cv2.INTER_LINEAR):
+    # Resize an image and make sure the output array has the correct shape
+    old_shape = img.shape
+    img = cv2.resize(img, new_size, interpolation=interpolation)
+    if len(old_shape == 3) and old_shape[2] == 1:
+        img = np.reshape(img, (new_size[0], new_size[1], 1))
 
     return img
 
@@ -153,9 +163,9 @@ def get_image_array(image_input,
                               .format(str(type(image_input))))
 
     if imgNorm == "sub_and_divide":
-        img = np.float32(cv2.resize(img, (width, height))) / 127.5 - 1
+        img = np.float32(resize(img, (width, height))) / 127.5 - 1
     elif imgNorm == "sub_mean":
-        img = cv2.resize(img, (width, height))
+        img = resize(img, (width, height))
         img = img.astype(np.float32)
         img = np.atleast_3d(img)
 
@@ -166,7 +176,7 @@ def get_image_array(image_input,
 
         img = img[:, :, ::-1]
     elif imgNorm == "divide":
-        img = cv2.resize(img, (width, height))
+        img = resize(img, (width, height))
         img = img.astype(np.float32)
         img = img/255.0
 
@@ -194,7 +204,7 @@ def get_segmentation_array(image_input, nClasses,
                               "Can't process input type {0}"
                               .format(str(type(image_input))))
 
-    img = cv2.resize(img, (width, height), interpolation=cv2.INTER_NEAREST)
+    img = resize(img, (width, height), interpolation=cv2.INTER_NEAREST)
     img = img[:, :, 0]
 
     for c in range(nClasses):
