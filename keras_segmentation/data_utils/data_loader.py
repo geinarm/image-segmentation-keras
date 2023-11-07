@@ -49,7 +49,7 @@ def resize(img, new_size, interpolation = cv2.INTER_LINEAR):
     # Resize an image and make sure the output array has the correct shape
     old_shape = img.shape
     img = cv2.resize(img, new_size, interpolation=interpolation)
-    if len(old_shape == 3) and old_shape[2] == 1:
+    if len(old_shape) == 3 and old_shape[2] == 1:
         img = np.reshape(img, (new_size[0], new_size[1], 1))
 
     return img
